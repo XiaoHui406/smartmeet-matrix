@@ -1,0 +1,93 @@
+{
+  "id": "zego-ZegoExpressUniApp-JS",
+  "displayName": "ZegoExpressEngine 音视频插件（JS）",
+  "version": "3.16.1",
+  "description": "ZegoExpressEngineSDK 音视频插件的JS包装",
+  "keywords": [
+    "音视频",
+    "直播",
+    "即构",
+    "zego",
+    "express"
+],
+  "type": "module",
+  "homepage": "https://zegocloud.com",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
+  "author": "zegocloud",
+  "repository": "",
+  "engines": {
+    "HBuilderX": "^3.1.0"
+  },
+"dcloudext": {
+    "type": "component-vue",
+    "sale": {
+      "regular": {
+        "price": "0.00"
+      },
+      "sourcecode": {
+        "price": "0.00"
+      }
+    },
+    "contact": {
+      "qq": ""
+    },
+    "declaration": {
+      "ads": "无",
+      "data": "插件使用的 Express Native SDK 会采集数据，详情可参考：https://www.zego.im/sdk-privacy",
+      "permissions": "无"
+    },
+    "npmurl": ""
+  },
+  "uni_modules": {
+    "dependencies": [],
+    "encrypt": [],
+    "platforms": {
+      "cloud": {
+        "tcb": "y",
+        "aliyun": "y",
+        "alipay": "y"
+      },
+      "client": {
+        "Vue": {
+          "vue2": "u",
+          "vue3": "u"
+        },
+        "App": {
+          "app-vue": "u",
+          "app-nvue": "u",
+          "app-uvue": "u"
+        },
+        "H5-mobile": {
+          "Safari": "u",
+          "Android Browser": "u",
+          "微信浏览器(Android)": "u",
+          "QQ浏览器(Android)": "u"
+        },
+        "H5-pc": {
+          "Chrome": "u",
+          "IE": "u",
+          "Edge": "u",
+          "Firefox": "u",
+          "Safari": "u"
+        },
+        "小程序": {
+          "微信": "u",
+          "阿里": "u",
+          "百度": "u",
+          "字节跳动": "u",
+          "QQ": "u",
+          "钉钉": "u",
+          "快手": "u",
+          "飞书": "u",
+          "京东": "u"
+        },
+        "快应用": {
+          "华为": "u",
+          "联盟": "u"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+<template>
+	<ZegoExpress-Remote-View :viewMode="viewMode" :streamID="streamID" :canvasType="canvasType"></ZegoExpress-Remote-View>
+</template>
+
+<script>
+	import {
+		ZegoViewMode
+	} from '../lib/ZegoExpressDefines';
+
+	export default {
+		name: 'ZegoRemoteView',
+		props: {
+			viewMode: {
+				type: Number,
+				default: ZegoViewMode.AspectFit
+			},
+			canvasType: {
+				type: Number,
+				default: 0
+			},
+			streamID: {
+				type: String,
+				default: ''
+			}
+		},
+	}
+</script>
+
+<style>
+
+</style>

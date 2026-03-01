@@ -1,0 +1,32 @@
+<template>
+	<ZegoExpress-Local-View :viewMode="viewMode" :channel="channel" :canvasType="canvasType"></ZegoExpress-Local-View>
+</template>
+
+<script>
+	import {
+		ZegoPublishChannel,
+		ZegoViewMode
+	} from '../lib/ZegoExpressDefines';
+
+	export default {
+		name: 'ZegoLocalView',
+		props: {
+			viewMode: {
+				type: Number,
+				default: ZegoViewMode.AspectFit
+			},
+			channel: {
+				type: Number,
+				default: ZegoPublishChannel.Main
+			},
+			canvasType: {
+				type: Number,
+				default: 0
+			}
+		},
+	}
+</script>
+
+<style>
+
+</style>

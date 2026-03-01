@@ -1,0 +1,737 @@
+<template>
+	<div class="meeting-container">
+		<view class="video-grid">
+			<text style="color: white;">{{roomState}}</text>
+			<!-- 本地预览视图 -->
+			<view class="video-card local-preview">
+				<view class="video-wrapper">
+					<!-- APP端预览 -->
+					<!-- #ifdef APP-PLUS -->
+					<zego-local-view :viewMode="publisherViewModeIndex" class="video-element"></zego-local-view>
+					<!-- #endif -->
+
+					<!-- H5端预览 -->
+					<!-- #ifdef H5 -->
+					<video id="local_video" class="video-element" autoplay playsinline :muted="pubVideoMuted"></video>
+					<!-- #endif -->
+				</view>
+				<view class="control-panel">
+					<view class="status-info">
+						<text class="user-name">{{ userName }}</text>
+						<!-- <text class="resolution">{{ publisherResolutionText }}</text>
+						<text class="quality">{{ publisherQualityText }}</text> -->
+					</view>
+					<view class="control-row">
+						<button class="ctrl-btn" :class="{ active: isPublishingStream }" @click="onPublish">
+							<text style="color: white;">{{ isPublishingStream ? '结束共享' : '开始共享' }}</text>
+						</button>
+						<view class="device-controls">
+							<view class="device-item">
+								<!-- <image class="device-icon" v-if="isCameraOpen == true" src="/static/Camera-open.png"
+									mode="widthFix" @tap="bindPublisherEnableCamera(false)"></image>
+								<image class="device-icon" v-else src="/static/Camera-close.png" mode="widthFix"
+									@tap="bindPublisherEnableCamera(true)"></image> -->
+								<text style="color: white;">摄像头</text>
+								<switch checked @change="bindPublisherEnableCamera" class="device-switch" />
+							</view>
+							<view class="device-item">
+								<!-- 	<image class="device-icon" v-if="isMicrophoneOpen == true"
+									src="/static/Microphone-open.png" mode="widthFix"
+									@tap="bindPublisherEnableMicrophone(false)"></image>
+								<image class="device-icon" v-else src="/static/Microphone-close.png" mode="widthFix"
+									@tap="bindPublisherEnableMicrophone(true)"></image> -->
+								<text style="color: white;">麦克风</text>
+								<switch checked @change="bindPublisherEnableMicrophone" class="device-switch" />
+							</view>
+						</view>
+					</view>
+				</view>
+			</view>
+
+			<view class="divider-line"></view>
+
+			<scroll-view class="remote-scroll" scroll-y>
+				<view class="remote-title">
+					<text style="color: white;">参会者视图</text>
+					<uni-icons type="scan" size="25" color="white" @tap="scanQRcode()"></uni-icons>
+				</view>
+				<!-- 远端参会者视图 -->
+				<view v-for="(item, index) in allUserViewObjectList" :key="item.userID" class="video-card remote-view">
+					<view class="video-wrapper">
+						<!-- APP端远程视图 -->
+						<!-- #ifdef APP-PLUS -->
+						<zego-remote-view v-if="item.streamID" :streamID="item.streamID" :viewMode="item.viewMode"
+							class="video-element">
+						</zego-remote-view>
+						<!-- #endif -->
+
+						<!-- H5端远程视图 -->
+						<!-- #ifdef H5 -->
+						<video :id="'video_'+item.streamID" class="video-element" autoplay playsinline
+							:muted="true"></video>
+						<!-- #endif -->
+					</view>
+					<view class="remote-controls">
+						<text class="user-name">{{ item.userName }}</text>
+						<view class="control-buttons">
+							<button class="ctrl-btn small" @click="onPlay(item)">
+								<text style="color: white">{{ item.isPlaying  ? '停止观看' : '观看画面' }}</text>
+							</button>
+						</view>
+					</view>
+				</view>
+			</scroll-view>
+		</view>
+	</div>
+</template>
+
+<script>
+	import permision from "@/pages/permission.js";
+	import ZegoExpressEngine, {
+		ZegoVideoMirrorMode
+	} from "@/uni_modules/zego-ZegoExpressUniApp-JS/components/zego-ZegoExpressUniApp-JS/lib/ZegoExpressEngine";
+	import {
+		ZegoScenario,
+		ZegoRoomState,
+		ZegoUpdateType,
+	} from "@/uni_modules/zego-ZegoExpressUniApp-JS/components/zego-ZegoExpressUniApp-JS/lib/ZegoExpressDefines";
+	import keyCenter from "@/pages/KeyCenter.js";
+
+	import ZegoLocalView from "@/uni_modules/zego-ZegoExpressUniApp-JS/components/zego-ZegoExpressUniApp-JS/zego-view/ZegoLocalView";
+	import ZegoRemoteView from "@/uni_modules/zego-ZegoExpressUniApp-JS/components/zego-ZegoExpressUniApp-JS/zego-view/ZegoRemoteView";
+	import main from "@/mixins";
+	import publish from "@/mixins/publish";
+	import {
+		getLoginToken
+	} from '@/pages/getToken'
+	import {
+		TokenService
+	} from "../../api/user";
+	import {
+		updateAttendanceStatusService,
+		updateAttendTimeService,
+		updateLeaveTimeService,
+		getUserattendMeetingsService
+	} from "../../api/attend_meeting.js"
+	import {
+		data
+	} from "uview-ui/libs/mixin/mixin";
+
+	export default {
+		mixins: [main, publish],
+		components: {
+			ZegoLocalView: ZegoLocalView,
+			ZegoRemoteView: ZegoRemoteView
+		},
+		data() {
+			return {
+				roomState: "Not Connected 🔴",
+				publisherVideoConfig: {},
+				publisherViewModeIndex: 0,
+				publisherViewModeArray: [{
+						name: "AspectFit",
+					},
+					{
+						name: "AspectFill",
+					},
+					{
+						name: "ScaleToFill",
+					},
+				],
+				publisherMirrorIndex: 2,
+				publisherMirrorArray: [{
+						name: "OnlyPreview",
+					},
+					{
+						name: "Both",
+					},
+					{
+						name: "No",
+					},
+					{
+						name: "OnlyPublish",
+					},
+				],
+				publisherCameraSelections: ["Back", "Front"],
+				publisherCameraCurrentSelect: 1,
+				publisherQualityText: "",
+				publisherResolutionText: "",
+				publisherName: "我",
+
+				allStreamList: [],
+				allUserViewObjectList: [],
+				token: "",
+				title: 'Hello',
+				msg: '123',
+				options: {
+					receordingDuration: 3600,
+					APPID: '5b0aa9e7',
+					// API_SECRET: 'NmIyZWFjYzMxNTEwMmRjZTE0YjcxNzIw',
+					API_KEY: '963b887e9e6bbedf0429ca3e06c41595'
+				},
+				roomID: 0,
+				userID: 0,
+				userName: "",
+				isCameraOpen: true,
+				isMicrophoneOpen: true
+			};
+		},
+		async onLoad() {
+			uni.$once('getMeetingData', (meetingData) => {
+				keyCenter.setUserID(meetingData.userID); // 动态注入用户ID
+				// keyCenter.setAppID(this.options.APPID); // 动态注入应用ID 
+				console.log(meetingData);
+				this.roomID = meetingData.roomID;
+				this.userID = meetingData.userID;
+				this.userName = meetingData.username;
+				this.publisherName = `我(${this.userID})\n roomid: ${this.roomID}`;
+				this.publisherVideoConfig = JSON.parse(meetingData.config)
+				this.getZegoToken().then(() => {
+					this.setup()
+				})
+			})
+			// console.log(option);
+			console.log("会议onload");
+			if (uni.getSystemInfoSync().platform === "android") {
+				await permision.requestAndroidPermission(
+					"android.permission.RECORD_AUDIO"
+				);
+				await permision.requestAndroidPermission(
+					"android.permission.CAMERA"
+				);
+			}
+			// keyCenter.setUserID(option.userID); // 动态注入用户ID 
+			// // keyCenter.setAppID(option.appID); // 动态注入应用ID 
+			// this.roomID = option.roomID;
+			// this.userID = option.userID;
+			// this.userName = option.username;
+			// this.publisherName = `我(${option.userID})\n roomid: ${this.roomID}`;
+			// this.publisherVideoConfig = JSON.parse(option.config);
+			// this.getZegoToken().then(() => {
+			// 	this.setup();
+			// })
+		},
+
+		methods: {
+			bindPublihserViewModeChange: function(e) {
+				this.publisherViewModeIndex = e.detail.value;
+			},
+			bindPublisherMirrorChange: function(e) {
+				this.publisherMirrorIndex = e.detail.value;
+				console.log(this.publisherMirrorIndex);
+				this.engine.setVideoMirrorMode(this.publisherMirrorIndex);
+			},
+			bindPublisherEnableCamera: function(e) {
+				this.engine.enableCamera(e.detail.value);
+			},
+			bindPublisherEnableMicrophone: function(e) {
+				this.engine.muteMicrophone(!e.detail.value);
+			},
+			// #ifdef APP-PLUS
+			bindPublisherCameraChange: function(e) {
+				this.engine.useFrontCamera(e.currentIndex == 1 ? true : false);
+			},
+			// #endif
+			bindPlayViewModeChange(e, item) {
+				this.$set(item, "viewMode", `${e.detail.value}`);
+			},
+			bindRemoteEnableAudio(item) {
+				item.muteAudio = !item.muteAudio;
+				this.engine.mutePlayStreamAudio(item.streamID, item.muteAudio);
+			},
+			bindRemoteEnableVideo(item) {
+				item.muteVideo = !item.muteVideo;
+				this.engine.mutePlayStreamVideo(item.streamID, item.muteVideo);
+			},
+			async getZegoToken() {
+				this.token = (await TokenService()).data
+				// console.log(this.token);
+			},
+			async updateAttendanceStatus() {
+				await updateAttendanceStatusService(this.userID, this.roomID, 3)
+			},
+			async updateAttendTime() {
+				let now = this.formatDateTime(new Date())
+				await updateAttendTimeService(this.userID, this.roomID, now)
+			},
+			async updateLeaveTime() {
+				let now = this.formatDateTime(new Date())
+				await updateLeaveTimeService(this.userID, this.roomID, now)
+			},
+			scanQRcode() {
+				uni.showModal({
+					title: "扫描二维码",
+					content: "要打开摄像头扫描二维码吗？",
+					success: (res) => {
+						if (res.confirm) {
+							uni.scanCode({
+								onlyFromCamera: false,
+								scanType: ["qrcode"],
+								success: (res) => {
+									let qrcodeInfo = JSON.parse(res.result)
+									console.log(qrcodeInfo);
+									let startTime = new Date(qrcodeInfo.startTime).getTime()
+									let endTime = new Date(qrcodeInfo.endTime).getTime()
+									let now = new Date().getTime()
+									if (this.roomID != qrcodeInfo.meetingId) {
+										uni.showToast({
+											icon: "error",
+											title: "会议ID错误"
+										})
+									} else if (now < startTime || now > endTime) {
+										uni.showToast({
+											icon: "error",
+											title: "二维码已失效"
+										})
+									} else {
+										this.updateAttendanceStatus()
+										this.updateAttendTime()
+										uni.showToast({
+											icon: "success",
+											title: "签到成功"
+										})
+									}
+								}
+							})
+						}
+					}
+				})
+			},
+			formatDateTime(date) {
+				const year = date.getFullYear();
+				const month = date.getMonth() + 1;
+				const day = date.getDate();
+				const hour = date.getHours();
+				const minute = date.getMinutes();
+				const second = date.getSeconds();
+				return `${year}/${this.pad(month)}/${this.pad(day)} ${this.pad(hour)}:${this.pad(minute)}:${this.pad(
+			    second
+			  )}`;
+			},
+			pad(num) {
+				return num.toString().padStart(2, "0");
+			},
+			async onPlay(item) {
+				console.log(item);
+				item.isPlaying = !(item.isPlaying || false);
+				if (item.isPlaying) {
+					this.$set(item, "buttonName", "Stop Playing");
+					const stream = await this.engine.startPlayingStream(
+						item.streamID
+					);
+					console.log(stream);
+					// #ifdef H5
+					document.querySelector("#video_" + item.streamID + " video").srcObject =
+						stream;
+					// #endif
+				} else {
+					this.$set(item, "buttonName", "Start Playing");
+					await this.engine.stopPlayingStream(item.streamID);
+					// #ifdef H5
+					document.querySelector("#video_" + item.streamID + " video").srcObject = null;
+					// #endif
+				}
+			},
+			onPublish: async function(e) {
+				if (this.isPublishingStream) {
+					this.engine.stopPreview();
+					await this.engine.stopPublishingStream();
+					// #ifdef H5
+					document.querySelector("#local_video video").srcObject = null;
+					// #endif
+					this.publishBtnName = "Start Publishing";
+				} else {
+					// #ifdef H5
+					this.engine.startPreview(
+						document.querySelector("#local_video video")
+					);
+					// #endif
+					// #ifdef APP-PLUS
+					this.engine.startPreview();
+					// #endif
+					const stream = await this.engine.startPublishingStream(
+						this.publishStreamID
+					);
+					this.publishBtnName = "Stop Publishing";
+				}
+				this.isPublishingStream = !this.isPublishingStream;
+			},
+
+			async setup() {
+				let profile = {
+					appID: keyCenter.getAppID(),
+					scenario: ZegoScenario.General
+				};
+				this.engine = await ZegoExpressEngine.createEngineWithProfile(
+					profile
+				);
+				this.engine.setVideoMirrorMode(ZegoVideoMirrorMode.BothMirror)
+				this.addListeners();
+
+				this.engine.setVideoConfig(this.publisherVideoConfig);
+				// const token = keyCenter.getToken() || await getLoginToken(this.userID, this.roomID);
+				console.log(this.token);
+				this.engine.loginRoom(
+					this.roomID, {
+						userID: this.userID,
+						userName: this.userName,
+					}, {
+						isUserStatusNotify: true,
+						token: this.token,
+					}
+				).then((res) => {
+					console.log(res);
+				})
+			},
+
+			addListeners() {
+				this.engine.on('roomUserUpdate', (roomID, updateType, userList) => {
+					if (updateType == ZegoUpdateType.Add) {
+						for (let user of userList) {
+							for (let stream of this.allStreamList) {
+								if (user.userID == stream.user.userID) {
+									user.streamID = stream.streamID;
+								}
+							}
+							this.allUserViewObjectList.push(user);
+						}
+					} else if (updateType == ZegoUpdateType.Delete) {
+						this.allUserViewObjectList =
+							this.allUserViewObjectList.filter((object) => {
+								for (let user of userList) {
+									if (user.userID == object.userID) {
+										return false;
+									}
+								}
+								return true;
+							});
+					}
+				});
+				this.engine.on(
+					"roomStateUpdate",
+					(roomID, state, errorCode, extendedData) => {
+						// console.log(errorCode);
+						if (errorCode != 0) {
+							console.log(
+								`🚩 ❌ 🚪 Room state error, errorCode:${errorCode}`
+							);
+						} else {
+							// console.log(state);
+							if (state == ZegoRoomState.Connected) {
+								this.roomState = "Connected 🟢";
+							} else if (state == ZegoRoomState.Connecting) {
+								this.roomState = "Connecting 🟡";
+							} else if (state == ZegoRoomState.DisConnected) {
+								this.roomState = "Not Connected 🔴";
+							}
+						}
+					}
+				);
+
+				this.engine.on("roomStreamUpdate", (roomID, updateType, streamList) => {
+					if (updateType == ZegoUpdateType.Add) {
+						for (let object of this.allUserViewObjectList) {
+							for (let stream of streamList) {
+								if (object.userID == stream.user.userID) {
+									object.streamID = stream.streamID;
+								}
+							}
+						}
+						this.allStreamList =
+							this.allStreamList.concat(streamList);
+						console.warn(this.allStreamList)
+					} else if (updateType == ZegoUpdateType.Delete) {
+						for (let object of this.allUserViewObjectList) {
+							for (let stream of streamList) {
+								if (object.streamID == stream.streamID) {
+									object.streamID = undefined;
+								}
+							}
+						}
+						this.allStreamList = this.allStreamList.filter(
+							(object) => {
+								for (let stream of streamList) {
+									if (object.streamID == stream.streamID) {
+										return false;
+									}
+								}
+								return true;
+							}
+						);
+					}
+				});
+				this.engine.on("roomOnlineUserCountUpdate", (roomID, count) => {});
+				this.engine.on("playerQualityUpdate", (streamID, quality) => {
+					let networkQuality = "";
+					switch (quality.level) {
+						case 0:
+							networkQuality = "☀️";
+							break;
+						case 1:
+							networkQuality = "⛅️";
+							break;
+						case 2:
+							networkQuality = "☁️";
+							break;
+						case 3:
+							networkQuality = "🌧";
+							break;
+						case 4:
+							networkQuality = "❌";
+							break;
+						default:
+							break;
+					}
+					for (let object of this.allUserViewObjectList) {
+						if (object.streamID == streamID) {
+							this.$set(
+								object,
+								"qualityText",
+								`VideoBitrate: ${quality.videoKBPS.toFixed(
+                                2
+                            )}\nVideoRecvFPS: ${quality.videoRecvFPS.toFixed(
+                                1
+                            )}\nRTT: ${quality.rtt}\nDelay: ${
+                                quality.delay
+                            }\nPackageLostRate: ${(
+                                quality.packetLostRate * 100.0
+                            ).toFixed(1)}\nNetworkQuality: ${networkQuality}`
+							);
+						}
+					}
+				});
+				this.engine.on("publisherQualityUpdate", (streamID, quality) => {
+					let networkQuality = "";
+					switch (quality.level) {
+						case 0:
+							networkQuality = "☀️";
+							break;
+						case 1:
+							networkQuality = "⛅️";
+							break;
+						case 2:
+							networkQuality = "☁️";
+							break;
+						case 3:
+							networkQuality = "🌧";
+							break;
+						case 4:
+							networkQuality = "❌";
+							break;
+						default:
+							break;
+					}
+					this.publisherQualityText = `VideoBitrate: ${quality.videoKBPS.toFixed(
+                    2
+                )}\nVideoSendFPS: ${quality.videoSendFPS.toFixed(1)}\nRTT: ${
+                    quality.rtt
+                }\nPackageLostRate: ${(quality.packetLostRate * 100.0).toFixed(
+                    1
+                )}\nNetworkQuality: ${networkQuality}`;
+				});
+				this.engine.on(
+					"publisherVideoSizeChanged",
+					(width, height, channel) => {
+						this.publisherResolutionText = `${width}X${height}`;
+					}
+				);
+				this.engine.on(
+					"playerVideoSizeChanged",
+					(streamID, width, height) => {
+						for (let object of this.allUserViewObjectList) {
+							if (object.streamID == streamID) {
+								this.$set(
+									object,
+									"resolutionText",
+									`${width}X${height}`
+								);
+							}
+						}
+					}
+				);
+			}
+		},
+	};
+</script>
+
+<style scoped>
+	page {
+		height: 100%;
+	}
+
+	/* 基础会议样式 */
+	.meeting-container {
+		background: #1A1D24;
+		min-height: 100%;
+		padding: 20rpx;
+		box-sizing: border-box;
+		flex: 1;
+	}
+
+	.video-grid {
+		display: flex;
+		flex-direction: column;
+		min-height: 100%;
+		margin-top: 80rpx;
+		/* grid-template-columns: repeat(auto-fill, minmax(400rpx, 1fr)); */
+		gap: 20rpx;
+		flex: 1;
+		/* background: #1A1D24; */
+	}
+
+	.video-card {
+		background: #2D3038;
+		border-radius: 24rpx;
+		overflow: hidden;
+		box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.2);
+		position: relative;
+	}
+
+	.video-wrapper {
+		position: relative;
+		background: #000;
+		height: 150vh;
+		/* padding-top: 56.25%; */
+		/* border: 5px solid white; */
+		/* 16:9比例 */
+	}
+
+	.video-element {
+		/* position: absolute;
+		top: 0;
+		left: 0; */
+		align-self: center;
+		width: 267vh;
+		height: 140vh;
+		object-fit: fill;
+		/* border: 5px solid yellow; */
+		/* object-fit: cover; */
+	}
+
+	/* 本地预览特殊样式 */
+	.local-preview {
+		/* grid-column: 1 / -1; */
+		background: #252830;
+	}
+
+	.local-preview .video-wrapper {
+		/* padding-top: 30%; */
+		/* 本地预览宽屏显示 */
+	}
+
+	/* 控制面板样式 */
+	.control-panel {
+		padding: 20rpx;
+	}
+
+	.status-info {
+		margin-bottom: 15rpx;
+	}
+
+	.status-info text {
+		display: block;
+		color: #B0B3B8;
+		font-size: 24rpx;
+		line-height: 1.4;
+	}
+
+	.user-name {
+		color: #E4E6EB;
+		font-size: 28rpx;
+		font-weight: 500;
+		margin-bottom: 10rpx;
+	}
+
+	/* 设备控制样式 */
+	.control-row {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+		justify-content: space-around;
+		color: white;
+	}
+
+	.device-controls {
+		display: flex;
+		flex-direction: row;
+		color: white;
+	}
+
+	.device-item {
+		display: flex;
+		align-items: center;
+		margin-left: 20rpx;
+		color: #E4E6EB;
+		font-size: 26rpx;
+	}
+
+	.device-icon {
+		display: none;
+		width: 60rpx;
+	}
+
+	.device-switch {
+		transform: scale(0.8);
+	}
+
+	/* 按钮样式 */
+	.ctrl-btn {
+		background: #3A3F47;
+		color: #E4E6EB;
+		border-radius: 8rpx;
+		font-size: 26rpx;
+		padding: 12rpx 24rpx;
+		transition: all 0.2s;
+	}
+
+	.ctrl-btn.active {
+		background: #FF5C5C;
+		color: #FFFFFF;
+	}
+
+	.ctrl-btn.small {
+		padding: 8rpx 16rpx;
+		font-size: 24rpx;
+	}
+
+	.remote-scroll {
+		flex: 1;
+		margin-top: 20rpx;
+		min-height: 0;
+	}
+
+	.remote-view {
+		/* margin-top: 20rpx; */
+	}
+
+	.remote-title {
+		width: 700rpx;
+		flex-direction: row;
+		justify-content: space-between;
+	}
+
+	/* 远程视图控制 */
+	.remote-controls {
+		padding: 15rpx;
+		/* background: rgba(0, 0, 0, 0.6); */
+		/* position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0; */
+	}
+
+	.transcript-module {
+		height: 600rpx;
+		background: #252830;
+		padding: 30rpx;
+		border-top: 2rpx solid #3A3F47;
+		box-shadow: 0 -4rpx 12rpx rgba(0, 0, 0, 0.2);
+	}
+
+	.divider-line {
+		height: 4rpx;
+		background-color: #FFFFFF;
+		margin: 5rpx 0;
+		box-shadow: 0 2rpx 8rpx rgba(255, 255, 255, 0.2);
+	}
+</style>

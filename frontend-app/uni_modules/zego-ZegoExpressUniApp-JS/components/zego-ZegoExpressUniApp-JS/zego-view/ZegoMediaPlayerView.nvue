@@ -1,0 +1,27 @@
+<template>
+	<ZegoExpress-Mediaplayer-View :playerID="playerID" :canvasType="canvasType" :alphaBlend="alphaBlend"></ZegoExpress-Mediaplayer-View>
+</template>
+
+<script>
+	export default {
+		name: 'ZegoMediaplayerView',
+		props: {
+			playerID: {
+				type: Number,
+				default: undefined
+			},
+			canvasType: {
+				type: Number,
+				default: 0
+			},
+			alphaBlend: {
+				type: Boolean,
+				default: false
+			}
+		},
+	}
+</script>
+
+<style>
+
+</style>

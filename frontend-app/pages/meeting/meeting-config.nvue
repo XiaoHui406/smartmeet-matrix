@@ -1,0 +1,352 @@
+<template>
+	<view class="page">
+		<!-- 标题区域 -->
+		<view class="title-area">
+			<text class="title-text">尊敬的用户：</text>
+			<text class="username">{{ userName }}</text>
+			<!--  <u-avatar size="100" :src="userInfoStore.info.userPic" shape="square" /> -->
+		</view>
+
+		<!-- 提示信息 -->
+		<view class="info-box">
+			<text class="info-text">请确认：</text>
+		</view>
+
+		<!-- 会议 ID -->
+		<view class="input-group">
+			<text class="label">您要参加的会议ID是：</text>
+			<view class="input-container">
+				<text class="input-value">{{ roomID }}</text>
+			</view>
+		</view>
+
+		<!-- 会议名称 -->
+		<view class="input-group">
+			<text class="label">您要参加的会议名称是：</text>
+			<view class="input-container">
+				<text class="input-value">{{ meetingName }}</text>
+			</view>
+		</view>
+
+		<!-- 登录按钮 -->
+		<button class="login-btn primary-btn" @click="onLoginRoom">进入</button>
+	</view>
+</template>
+
+<script setup>
+	// 保持原有的逻辑不变
+	import {
+		ref,
+		reactive,
+		onMounted,
+		onUnmounted
+	} from 'vue'
+	import keyCenter from '@/pages/KeyCenter.js'
+	import useUserInfoStore from '@/stores/userInfo.js'
+
+	const userInfoStore = useUserInfoStore()
+	const userInfo = ref({
+		...userInfoStore.info
+	})
+	console.log(keyCenter.getToken());
+
+	const roomID = ref('20')
+	const userID = ref(userInfo.value.userId)
+	const userName = ref(userInfo.value.username)
+	const meetingName = ref('自动驾驶安全')
+	const videoConfig = reactive({
+		encodeWidth: 360,
+		encodeHeight: 640,
+		fps: 24,
+		bitrate: 600
+	})
+
+	// 生命周期和事件处理
+	onMounted(() => console.log('mounted'))
+	onUnmounted(() => console.log('onUnload'))
+
+	const onBackPress = () => {
+		console.log('onBackPress')
+	}
+
+	const onLoginRoom = () => {
+		const url = '/pages/meeting/meeting1-detail'
+		const config = JSON.stringify(videoConfig)
+		uni.navigateTo({
+			url: `${url}?config=${config}&roomID=${roomID.value}&userID=${userID.value}&userName=${userName.value}`
+		})
+	}
+</script>
+
+
+// <style lang="scss">
+	// 	/* 颜色变量 */
+	// 	$cyber-blue: #00f3ff;
+	// 	$neon-purple: #bc13fe;
+	// 	$matrix-green: #0aff0a;
+	// 	$cyber-gradient: linear-gradient(135deg, $cyber-blue 0%, $neon-purple 100%);
+
+	// 	.page {
+	// 		position: relative;
+	// 		height: 100vh;
+	// 		overflow: hidden;
+	// 		padding: 40rpx;
+	// 		background: #0a0e1a;
+	// 		color: white;
+
+	// 		/* 全息背景效果 */
+	// 		&::before {
+	// 			content: '';
+	// 			position: absolute;
+	// 			top: -50%;
+	// 			left: -50%;
+	// 			width: 200%;
+	// 			height: 200%;
+	// 			background:
+	// 				repeating-linear-gradient(45deg,
+	// 					transparent 0%,
+	// 					rgba($cyber-blue, 0.1) 2%,
+	// 					transparent 4%),
+	// 				radial-gradient(circle at 50% 50%, rgba($neon-purple, 0.1) 0%, transparent 30%);
+	// 			animation: hologram 20s infinite linear;
+	// 			opacity: 0.8;
+	// 		}
+
+	// 		/* 动态网格线 */
+	// 		&::after {
+	// 			content: '';
+	// 			position: absolute;
+	// 			top: 0;
+	// 			left: 0;
+	// 			width: 200%;
+	// 			height: 200%;
+	// 			background-image:
+	// 				linear-gradient(rgba($cyber-blue, 0.1) 1px, transparent 1px),
+	// 				linear-gradient(90deg, rgba($cyber-blue, 0.1) 1px, transparent 1px);
+	// 			background-size: 40rpx 40rpx;
+	// 			animation: gridMove 20s linear infinite;
+	// 		}
+	// 	}
+
+	// 	/* 标题区域 */
+	// 	.title-area {
+	// 		position: relative;
+	// 		z-index: 2;
+	// 		margin-bottom: 80rpx;
+	// 		padding-bottom: 40rpx;
+	// 		border-bottom: 2rpx solid rgba($cyber-blue, 0.3);
+
+	// 		.title-text {
+	// 			font-size: 56rpx;
+	// 			background: $cyber-gradient;
+	// 			-webkit-background-clip: text;
+	// 			-webkit-text-fill-color: transparent;
+	// 			font-family: 'Segoe UI', sans-serif;
+	// 			font-weight: 700;
+	// 			letter-spacing: 4rpx;
+	// 			position: relative;
+
+	// 			&::after {
+	// 				content: '';
+	// 				position: absolute;
+	// 				bottom: -20rpx;
+	// 				left: 0;
+	// 				width: 100%;
+	// 				height: 4rpx;
+	// 				background: $cyber-gradient;
+	// 				box-shadow: 0 0 20rpx $cyber-blue;
+	// 			}
+	// 		}
+
+	// 		.username {
+	// 			margin-left: 40rpx;
+	// 			font-size: 48rpx;
+	// 			color: $neon-purple;
+	// 			text-shadow: 0 0 20rpx rgba($neon-purple, 0.5);
+	// 		}
+	// 	}
+
+	// 	/* 信息框 */
+	// 	.info-box {
+	// 		position: relative;
+	// 		z-index: 2;
+	// 		margin-bottom: 60rpx;
+
+	// 		.info-text {
+	// 			font-size: 36rpx;
+	// 			letter-spacing: 4rpx;
+	// 			position: relative;
+	// 			padding-left: 60rpx;
+
+	// 			&::before {
+	// 				content: '▶';
+	// 				position: absolute;
+	// 				left: 0;
+	// 				color: $matrix-green;
+	// 				text-shadow: 0 0 20rpx $matrix-green;
+	// 				animation: blink 1s infinite;
+	// 			}
+	// 		}
+	// 	}
+
+	// 	/* 输入组 */
+	// 	.input-group {
+	// 		position: relative;
+	// 		z-index: 2;
+	// 		margin-bottom: 60rpx;
+
+	// 		.label {
+	// 			font-size: 32rpx;
+	// 			color: rgba($cyber-blue, 0.8);
+	// 			margin-bottom: 30rpx;
+	// 			padding-left: 40rpx;
+	// 			position: relative;
+
+	// 			&::before {
+	// 				content: '';
+	// 				position: absolute;
+	// 				left: 0;
+	// 				top: 50%;
+	// 				width: 24rpx;
+	// 				height: 24rpx;
+	// 				background: $cyber-gradient;
+	// 				clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+	// 				transform: translateY(-50%);
+	// 			}
+	// 		}
+
+	// 		.input-container {
+	// 			background: rgba(16, 40, 80, 0.2);
+	// 			border: 2rpx solid rgba($cyber-blue, 0.3);
+	// 			border-radius: 16rpx;
+	// 			padding: 32rpx;
+	// 			backdrop-filter: blur(20rpx);
+	// 			position: relative;
+	// 			transition: all 0.3s;
+
+	// 			&::before {
+	// 				content: '';
+	// 				position: absolute;
+	// 				inset: 0;
+	// 				border-radius: inherit;
+	// 				padding: 2rpx;
+	// 				background: $cyber-gradient;
+	// 				-webkit-mask:
+	// 					linear-gradient(#fff 0 0) content-box,
+	// 					linear-gradient(#fff 0 0);
+	// 				mask:
+	// 					linear-gradient(#fff 0 0) content-box,
+	// 					linear-gradient(#fff 0 0);
+	// 				-webkit-mask-composite: xor;
+	// 				mask-composite: exclude;
+	// 			}
+
+	// 			&:hover {
+	// 				transform: translateY(-4rpx);
+	// 				box-shadow: 0 8rpx 40rpx rgba($cyber-blue, 0.3);
+	// 			}
+	// 		}
+
+	// 		.input-value {
+	// 			color: white;
+	// 			font-size: 36rpx;
+	// 			letter-spacing: 4rpx;
+	// 			font-family: 'Courier New', monospace;
+	// 			text-shadow: 0 0 10rpx $cyber-blue;
+	// 		}
+	// 	}
+
+	// 	/* 登录按钮 */
+	// 	.login-btn {
+	// 		position: relative;
+	// 		z-index: 2;
+	// 		width: 100%;
+	// 		height: 120rpx;
+	// 		background:
+	// 			linear-gradient(90deg,
+	// 				rgba($cyber-blue, 0.8) 0%,
+	// 				rgba($neon-purple, 0.8) 100%);
+	// 		border: none;
+	// 		border-radius: 16rpx;
+	// 		color: white;
+	// 		font-size: 40rpx;
+	// 		letter-spacing: 8rpx;
+	// 		overflow: hidden;
+	// 		transition: all 0.3s;
+
+	// 		&::before {
+	// 			content: '';
+	// 			position: absolute;
+	// 			top: -50%;
+	// 			left: -50%;
+	// 			width: 200%;
+	// 			height: 200%;
+	// 			background: linear-gradient(45deg,
+	// 					transparent 25%,
+	// 					rgba(255, 255, 255, 0.2) 50%,
+	// 					transparent 75%);
+	// 			animation: btnScan 3s infinite linear;
+	// 		}
+
+	// 		&:active {
+	// 			transform: scale(0.96);
+	// 			opacity: 0.9;
+	// 		}
+	// 	}
+
+	// 	/* 动画定义 */
+	// 	@keyframes hologram {
+	// 		0% {
+	// 			transform: translate(0, 0) rotate(0deg);
+	// 		}
+
+	// 		25% {
+	// 			transform: translate(-5%, 5%) rotate(1deg);
+	// 		}
+
+	// 		50% {
+	// 			transform: translate(5%, -5%) rotate(-1deg);
+	// 		}
+
+	// 		75% {
+	// 			transform: translate(-3%, 3%) rotate(0.5deg);
+	// 		}
+
+	// 		100% {
+	// 			transform: translate(0, 0) rotate(0deg);
+	// 		}
+	// 	}
+
+	// 	@keyframes gridMove {
+	// 		0% {
+	// 			transform: translate(0, 0);
+	// 		}
+
+	// 		100% {
+	// 			transform: translate(-40rpx, -40rpx);
+	// 		}
+	// 	}
+
+	// 	@keyframes btnScan {
+	// 		0% {
+	// 			transform: translateX(-100%) rotate(45deg);
+	// 		}
+
+	// 		100% {
+	// 			transform: translateX(100%) rotate(45deg);
+	// 		}
+	// 	}
+
+	// 	@keyframes blink {
+
+	// 		0%,
+	// 		100% {
+	// 			opacity: 1;
+	// 		}
+
+	// 		50% {
+	// 			opacity: 0.5;
+	// 		}
+	// 	}
+	// 
+</style>

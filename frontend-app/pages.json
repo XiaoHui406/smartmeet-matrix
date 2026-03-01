@@ -1,0 +1,235 @@
+{
+	"easycom": {
+		"^u-(.*)": "uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/start_page/start_page",
+			"style": {
+				"navigationStyle": "custom" // 隐藏导航栏 
+			}
+		},
+		{
+			"path": "pages/login",
+			"style": {
+				"navigationStyle": "custom", // 隐藏导航栏 
+				"app-plus": {
+					"titleNView": false
+				}
+			}
+		},
+		{
+			"path": "pages/index/agent",
+			"style": {
+				"navigationBarTitleText": "智会助手",
+				"navigationBarBackgroundColor": "white"
+			}
+		},
+		{
+			"path": "pages/mine/mine",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/mine/aboutme",
+			"style": {
+				"navigationBarTitleText": "关于我们"
+			}
+		},
+		{
+			"path": "pages/mine/userInfo",
+			"style": {
+				"navigationBarTitleText": "编辑资料"
+			}
+		},
+		{
+			"path": "pages/mine/updateUserPic",
+			"style": {
+				"navigationBarTitleText": "更换头像"
+			}
+		},
+		{
+			"path": "pages/mine/setting",
+			"style": {
+				"navigationBarTitleText": "设置与隐私"
+			}
+		},
+		{
+			"path": "pages/mine/updatePassword",
+			"style": {
+				"navigationBarTitleText": "更改密码"
+			}
+		},
+		{
+			"path": "pages/mine/interest",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/organization/organization",
+			"style": {
+				"navigationBarTitleText": "我的组织"
+			}
+		},
+		{
+			"path": "pages/meeting/attendMeeting",
+			"style": {
+				"navigationBarTitleText": "会议记录"
+			}
+		},
+		{
+			"path": "pages/meeting/meetingMaterials",
+			"style": {
+				"navigationBarTitleText": "会议资料"
+			}
+		},
+		{
+			"path": "pages/meeting/meeting-config",
+			"style": {
+				"navigationBarTitleText": "前览页"
+			}
+		},
+		{
+			"path": "pages/navigation/navigation",
+			"style": {
+				"navigationBarTitleText": "导航"
+			}
+		},
+		{
+			"path": "pages/audio_to_text/audio_to_text",
+			"style": {
+				"navigationStyle": "custom",
+				"app-plus": {
+					"subNVues": [{
+						"id": "meeting",
+						"path": "pages/meeting/meeting-detail",
+						"style": {
+							"position": "dock",
+							"width": "100%",
+							"height": "70%",
+							"top": "0",
+							"left": "0"
+						}
+					}]
+				}
+			}
+		},
+		{
+			"path": "pages/home/home",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/add_meeting/add_meeting",
+			"style": {
+				"navigationBarTitleText": "加入会议"
+			}
+		},
+		{
+			"path": "pages/meeting_material/meeting_material",
+			"style": {
+				"navigationBarTitleText": "会议资料"
+			}
+		},
+		{
+			"path": "pages/meeting_detail/meeting_detail",
+			"style": {
+				"navigationBarTitleText": "会议详情"
+			}
+		},
+		{
+			"path": "pages/messages/messages",
+			"style": {
+				"navigationBarTitleText": "消息"
+			}
+		},
+		{
+			"path": "pages/add_meeting/add_meeting_by_id",
+			"style": {
+				"navigationBarTitleText": "加入会议"
+			}
+		},
+		{
+			"path": "pages/messages/message_detail",
+			"style": {
+				"navigationBarTitleText": "消息详情"
+			}
+		},
+		{
+			"path": "pages/recommend/recommend",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/meeting_material/download_material",
+			"style": {
+				"navigationBarTitleText": "文件下载"
+			}
+		},
+		{
+			"path": "pages/meeting_detail/meeting_topic_detail",
+			"style": {
+				"navigationBarTitleText": "会议议程"
+			}
+		},
+		{
+			"path": "pages/meeting_detail/add_comment",
+			"style": {
+				"navigationBarTitleText": "发布评论"
+			}
+		},
+		{
+			"path": "pages/meeting_detail/commenter_info",
+			"style": {
+				"navigationBarTitleText": "用户信息"
+			}
+		},
+		{
+			"path" : "pages/mine/kefu",
+			"style" : 
+			{
+				"navigationBarTitleText" : "客服与帮助"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#F8F8F8",
+		"backgroundColor": "#F8F8F8"
+	},
+	"tabBar": {
+		"list": [{
+				"pagePath": "pages/recommend/recommend",
+				"text": "推荐",
+				"iconPath": "/static/recommend/recommend.png",
+				"selectedIconPath": "/static/recommend/recommend(selected).png"
+			},
+			{
+				"pagePath": "pages/home/home",
+				"text": "会议",
+				"iconPath": "/static/home/meeting.png",
+				"selectedIconPath": "/static/home/meeting(selected).png"
+			},
+			{
+				"pagePath": "pages/mine/mine",
+				"text": "我的",
+				"iconPath": "/static/mine/mine.png",
+				"selectedIconPath": "/static/mine/mine(selected).png"
+			}
+		]
+	},
+	"uniIdRouter": {},
+	"condition": { //模式配置，仅开发期间生效
+		"current": 0, //当前激活的模式(list 的索引项)
+		"list": [{
+			"name": "", //模式名称
+			"path": "", //启动页面，必选
+			"query": "" //启动参数，在页面的onLoad函数里面得到
+		}]
+	}
+}

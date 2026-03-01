@@ -1,0 +1,41 @@
+<template>
+	<ZegoExpress-Local-View v-if="local" :viewMode="viewMode" :channel="channel" :canvasType="canvasType"></ZegoExpress-Local-View>
+	<ZegoExpress-Remote-View v-else :viewMode="viewMode" :streamID="streamID" :canvasType="canvasType"></ZegoExpress-Remote-View>
+</template>
+
+<script>
+	import {
+		ZegoViewMode,
+		ZegoPublishChannel
+	} from '../lib/ZegoExpressDefines';
+	
+	export default {
+		name: 'ZegoCommonView',
+		props: {
+			viewMode: {
+				type: Number,
+				default: ZegoViewMode.AspectFit
+			},
+			canvasType: {
+				type: Number,
+				default: 0
+			},
+			streamID: {
+				type: Number | undefined,
+				default: undefined
+			},
+			channel: {
+				type: Number,
+				default: ZegoPublishChannel.Main
+			},
+			local: {
+				type: Boolean,
+				default: undefined
+			}
+		},
+	}
+</script>
+
+<style>
+
+</style>
