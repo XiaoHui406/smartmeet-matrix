@@ -159,9 +159,9 @@ spring:
 - [x] PC端基础框架搭建 (Vue3 + Element Plus)
 - [x] 移动端基础框架搭建 (UniApp + uView UI)
 - [x] 数据库设计与基础表结构
+- [x] 后端接口文档 (openapi + swagger生成)
 
 ### 计划中
-- [ ] 后端接口文档 (openapi + swagger生成)
 - [ ] 重构个性化推荐 (使用文本相似度计算)
 
 ## 📄 许可证
