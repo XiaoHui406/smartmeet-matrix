@@ -1,5 +1,6 @@
 package org.meeting.controller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.URL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
+@Tag(name = "用户", description = "用户相关接口")
 public class UserController {
     @Autowired
     private UserService userService;

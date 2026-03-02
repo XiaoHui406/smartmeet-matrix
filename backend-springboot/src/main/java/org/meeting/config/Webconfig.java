@@ -15,7 +15,15 @@ public class Webconfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginInterceptor).excludePathPatterns("/user/login", "/user/register", "/getAiReply");
+        registry.addInterceptor(loginInterceptor).excludePathPatterns(
+                "/user/login", "/user/register", "/getAiReply",
+                "/docs", "/api-docs", "/swagger-ui/index.html",
+                "/swagger-ui/index.css", "/swagger-ui/swagger-ui-bundle.js",
+                "/swagger-ui/swagger-initializer.js",
+                "/swagger-ui/swagger-ui-standalone-preset.js",
+                "/swagger-ui/favicon-32x32.png", "/swagger-ui/favicon-16x16.png",
+                "/swagger-ui/swagger-ui.css", "/api-docs/swagger-config"
+        );
     }
 
     @Override
