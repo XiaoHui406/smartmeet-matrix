@@ -1,5 +1,7 @@
 package org.meeting.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.json.JSONException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +14,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/token")
+@Tag(name = "视频会议token", description = "视频会议token相关接口")
 public class TokenController {
     @PostMapping("/generate")
+    @Operation(summary = "获取zego视频会议token")
     public Result<String> generateToken() throws JSONException {
         long appId = 0; // 替换为你的 appId
         String serverSecret = ""; // 替换为你的 serverSecret

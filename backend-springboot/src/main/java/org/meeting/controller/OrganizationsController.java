@@ -1,5 +1,7 @@
 package org.meeting.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.meeting.pojo.OrganizationMember;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/organizations")
+@Tag(name = "组织", description = "组织相关接口")
 public class OrganizationsController {
     // 自动注入OrganizationsService，用于处理组织相关的业务逻辑
     @Autowired
@@ -26,6 +29,7 @@ public class OrganizationsController {
 
     // 处理POST请求，用于添加新的组织
     @PostMapping("/add")
+    @Operation(summary = "创建组织")
     public Result add(@RequestBody Organizations organizations) {
         // 调用服务层的add方法，将新的组织信息保存到数据库
         organizationsService.add(organizations);
@@ -37,6 +41,7 @@ public class OrganizationsController {
 
     // 处理POST请求，用于更新现有组织的详细信息
     @PostMapping("/update")
+    @Operation(summary = "更新组织相关信息")
     public Result update(@RequestBody Organizations organizations) {
         // 调用服务层的update方法，更新组织信息
         organizationsService.update(organizations);
@@ -46,6 +51,7 @@ public class OrganizationsController {
 
     // 处理DELETE请求，用于删除指定ID的组织
     @DeleteMapping("/delete")
+    @Operation(summary = "删除组织")
     public Result delete(Integer organizationId) {
         // 调用服务层的delete方法，根据组织ID删除组织
         organizationsService.delete(organizationId);
@@ -55,6 +61,7 @@ public class OrganizationsController {
 
     // 处理GET请求，用于获取当前用户所属的所有组织
     @GetMapping("/myOrganizations")
+    @Operation(summary = "获取用户参加的组织")
     public Result<List<Organizations>> findById() {
         // 从ThreadLocal中获取当前用户的信息
         Map<String, Object> map = ThreadLocalUtil.get();
@@ -70,6 +77,7 @@ public class OrganizationsController {
     }
 
     @GetMapping("/all")
+    @Operation(summary = "获取所有组织")
     public Result<List<Organizations>> findAll() {
         return Result.success(organizationsService.findAll());
     }

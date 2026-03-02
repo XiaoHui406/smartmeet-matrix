@@ -1,12 +1,14 @@
 package org.meeting.controller;
 
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.meeting.pojo.Result;
 import org.meeting.utils.KimiApiUtil;
 
 @RestController
+@Tag(name = "AI助手", description = "Kimi AI助手相关接口")
 public class KimiApiController {
     private static final String API_KEY = "";
     private static final String MODEL = "moonshot-v1-8k";
@@ -18,33 +20,22 @@ public class KimiApiController {
 
     private static final double TEMPERATURE = 0.3;
 
-    // 工具类实例
     private final KimiApiUtil kimiApiUtil = new KimiApiUtil(API_KEY);
 
-    /**
-     * 接收用户传入的内容并调用 Kimi API 获取回复
-     *
-     * @param content 用户传入的内容
-     * @return AI 的回复或错误信息
-     */
     @PostMapping("/getAiReply")
+    @Operation(summary = "获取AI回复")
     public Result<String> getAiReply(String content) {
-        // 检查 content 是否为空
         if (content == null || content.isEmpty()) {
             return Result.error("内容不能为空");
         }
         try {
-            // 调用工具类获取 AI 回复
             String aiReply = kimiApiUtil.getCompletion(MODEL, SYSTEM_MESSAGE, content, TEMPERATURE);
-
-            // 处理返回结果
             if (aiReply != null) {
                 return Result.success(aiReply);
             } else {
                 return Result.error("无法获取 AI 回复，请稍后再试");
             }
         } catch (Exception e) {
-            // 捕获异常并返回错误信息
             return Result.error("获取 AI 回复时发生异常: " + e.getMessage());
         }
     }
@@ -55,22 +46,19 @@ public class KimiApiController {
             "2.议题名：XXX 内容：XXX 开始时间：yyyy-MM-dd HH:mm:ss 结束时间：yyyy-MM-dd HH:mm:ss 主持人：XXX...";
 
     @PostMapping("/getTopic")
+    @Operation(summary = "自动生成会议议题")
     public Result<String> getTopic(String content) {
-        // 检查 content 是否为空
         if (content == null || content.isEmpty()) {
             return Result.error("内容不能为空");
         }
         try {
-            // 调用工具类获取 AI 回复
             String aiReply = kimiApiUtil.getCompletion(MODEL, SYSTEM_MESSAGE2, content, TEMPERATURE);
-            // 处理返回结果
             if (aiReply != null) {
                 return Result.success(aiReply);
             } else {
                 return Result.error("无法获取 AI 回复，请稍后再试");
             }
         } catch (Exception e) {
-            // 捕获异常并返回错误信息
             return Result.error("获取 AI 回复时发生异常: " + e.getMessage());
         }
     }

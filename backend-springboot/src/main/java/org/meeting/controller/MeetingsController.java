@@ -1,5 +1,7 @@
 package org.meeting.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.meeting.pojo.AttendMeeting;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/meeting")
+@Tag(name = "会议", description = "会议相关接口")
 public class MeetingsController {
     // 自动注入MeetingsService，用于处理会议相关的业务逻辑
     @Autowired
@@ -26,6 +29,7 @@ public class MeetingsController {
 
     // 处理GET请求，路径为"/all"，用于获取所有会议信息
     @GetMapping("/all")
+    @Operation(summary = "获取所有会议")
     public Result<List<Meetings>> getAllMeetings() {
         // 从ThreadLocal中获取当前线程的用户信息
         Map<String, Object> map = ThreadLocalUtil.get();
@@ -39,6 +43,7 @@ public class MeetingsController {
 
     // 处理POST请求，路径为"/detail"，用于根据会议ID获取会议详细信息
     @PostMapping("/detail")
+    @Operation(summary = "根据ID获取会议详情")
     public Result<Meetings> getMeetingById(Integer meetingId) {
         // 调用服务层方法根据会议ID获取会议信息
         Meetings meetings = meetingsService.getMeetingById(meetingId);
@@ -52,6 +57,7 @@ public class MeetingsController {
 
     // 处理POST请求，路径为"/add"，用于添加新的会议
     @PostMapping("/add")
+    @Operation(summary = "添加会议")
     public Result addMeeting(@RequestBody Meetings meetings) {
         // 调用服务层方法添加会议
         meetingsService.addMeeting(meetings);
@@ -63,6 +69,7 @@ public class MeetingsController {
 
     // 处理PUT请求，路径为"/update"，用于更新会议信息
     @PutMapping("/update")
+    @Operation(summary = "更新会议")
     public Result updateMeeting(@RequestBody Meetings meetings) {
         // 调用服务层方法更新会议信息
         meetingsService.updateMeeting(meetings);
@@ -72,6 +79,7 @@ public class MeetingsController {
 
     // 处理DELETE请求，路径为"/delete"，用于删除会议
     @DeleteMapping("/delete")
+    @Operation(summary = "删除会议")
     public Result deleteMeeting(Integer meetingId) {
         // 调用服务层方法删除会议
         meetingsService.deleteMeeting(meetingId);
@@ -81,6 +89,7 @@ public class MeetingsController {
 
     // 处理PUT请求，路径为"/updateStatus"，用于更新会议状态
     @PutMapping("/updateStatus")
+    @Operation(summary = "更新会议状态")
     public Result updateStatus(Integer meetingId, Integer meetingStatus) {
         // 调用服务层方法更新会议状态
         meetingsService.updateStatus(meetingId, meetingStatus);
@@ -90,6 +99,7 @@ public class MeetingsController {
 
     // 处理PUT请求，路径为"/updateClickCount"，用于更新会议点击次数
     @PutMapping("/updateClickCount")
+    @Operation(summary = "更新会议点击次数")
     public Result updateClickCount(Integer meetingId) {
         // 调用服务层方法更新会议点击次数
         meetingsService.updateClickCount(meetingId);
@@ -99,6 +109,7 @@ public class MeetingsController {
 
     // 处理GET请求，路径为"/getMyMeetings"，用于获取用户参加的所有会议
     @GetMapping("/getMyMeetings")
+    @Operation(summary = "获取我参加的会议")
     public Result<List<Meetings>> getMyMeetings() {
         // 从ThreadLocal中获取当前线程的用户信息
         Map<String, Object> map = ThreadLocalUtil.get();
@@ -118,6 +129,7 @@ public class MeetingsController {
     }
 
     @GetMapping("/getPublicMeetings")
+    @Operation(summary = "获取公开会议列表")
     public Result<List<Meetings>> getPublicMeetings(@RequestParam(required = false, defaultValue = "0") Integer sortType) {
         //sortType为0时或者为空时，按照数据库里排序默认输出，为1时按照click_count降序，为2时按照start_time升序，为3的时候为个性化推荐会议列表，为4的时候按照参会人数降序，为5的时候按照点击次数和参会人数综合排序。
         List<Meetings> meetings = meetingsService.getPublicMeetings(sortType);

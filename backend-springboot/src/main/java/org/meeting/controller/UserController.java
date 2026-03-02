@@ -1,5 +1,6 @@
 package org.meeting.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.URL;
@@ -30,6 +31,7 @@ public class UserController {
     private StringRedisTemplate stringRedisTemplate;
 
     @PostMapping("/register")
+    @Operation(summary = "注册")
     public Result register(@Pattern(regexp = "^\\S{11}$") String account, String password) {
         Users u = userService.findByAccount(account);
         if (u == null) {
@@ -41,6 +43,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "登录")
     public Result login(@Pattern(regexp = "^\\S{11}$") String account, String password) {
         Users loginUser = userService.findByAccount(account);
         if (loginUser == null) {
@@ -60,6 +63,7 @@ public class UserController {
     }
 
     @GetMapping("/userInfo")
+    @Operation(summary = "获取用户信息")
     public Result<Users> userInfo() {
         Map<String, Object> map = ThreadLocalUtil.get();
         String account = (String) map.get("account");
@@ -68,18 +72,21 @@ public class UserController {
     }
 
     @PutMapping("/update")
+    @Operation(summary = "更新用户信息")
     public Result update(@Validated @RequestBody Users user) {
         userService.update(user);
         return Result.success();
     }
 
     @PatchMapping("updateAvatar")
+    @Operation(summary = "更换用户头像")
     public Result updateAvatar(@RequestParam @URL String avatarUrl) {
         userService.updateAvatar(avatarUrl);
         return Result.success();
     }
 
     @PatchMapping("updatePwd")
+    @Operation(summary = "修改密码")
     public Result updatePwd(@RequestBody Map<String, String> params, @RequestHeader("Authorization") String token) {
         String oldPwd = params.get("old_pwd");
         String newPwd = params.get("new_pwd");
@@ -105,18 +112,21 @@ public class UserController {
     }
 
     @PatchMapping("updateInterest")
+    @Operation(summary = "更新用户兴趣")
     public Result updateInterest(String interest) {
         userService.updateInterest(interest);
         return Result.success();
     }
 
     @PostMapping("findById")
+    @Operation(summary = "根据id查找用户")
     public Result findById(Integer userId) {
         Users users = userService.findById(userId);
         return Result.success(users);
     }
 
     @PostMapping("/findByAccount")
+    @Operation(summary = "根据账号查找用户")
     public Result findByAccount(String account) {
         Users users = userService.findByAccount(account);
         return Result.success(users);
