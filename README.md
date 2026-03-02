@@ -37,7 +37,7 @@
 ### 开发工具
 - **前端构建**: Vite (Web), HBuilderX (App)
 - **后端构建**: Maven
-- **接口文档**: 待补充
+- **接口文档**: OpenAPI + Swagger
 - **版本控制**: Git
 
 ## 📁 项目结构
