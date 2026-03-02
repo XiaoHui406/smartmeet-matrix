@@ -22,6 +22,12 @@ public class KimiApiController {
 
     private final KimiApiUtil kimiApiUtil = new KimiApiUtil(API_KEY);
 
+    /**
+     * 接收用户传入的内容并调用 Kimi API 获取回复
+     *
+     * @param content 用户传入的内容
+     * @return AI 的回复或错误信息
+     */
     @PostMapping("/getAiReply")
     @Operation(summary = "获取AI回复")
     public Result<String> getAiReply(String content) {
