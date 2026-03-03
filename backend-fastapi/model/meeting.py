@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import Integer, String, DateTime, Text
 from typing import Optional
 from datetime import datetime
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 
 class Meeting(Base):
@@ -69,3 +69,5 @@ class MeetingSchema(BaseModel):
     meeting_password: Optional[str] = None
     attendee_count: Optional[int] = None
     weight_score: Optional[int] = None
+
+    model_config = ConfigDict(from_attributes=True)
