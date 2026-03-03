@@ -132,8 +132,7 @@ npm install
 ### 4. 初始化数据库
 
 1. 创建数据库 `meeting_db`
-2. 执行 SQL 脚本 (位于 `backend-springboot/src/main/resources/schema.sql`，如有)
-3. 配置数据源信息在 `application.yml`
+2. 配置数据源信息在 `application.yml`
 
 ## 🔧 配置说明
 
