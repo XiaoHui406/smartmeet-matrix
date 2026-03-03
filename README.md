@@ -7,12 +7,14 @@
 ## ✨ 功能特性
 
 ### 主办方 (PC端)
+
 - **会议创建与管理**：支持时间、地点、议题的全流程配置
 - **数据大屏**：实时监控参会率、热点议题及会议动态
 - **资料库管理**：构建一体化资料库，支持一键式批量下载与智能检索
 - **多语言支持**：自动翻译会议资料与实时字幕
 
 ### 参会者 (移动端)
+
 - **智能导航**：连接百度地图api，提供智能路径规划
 - **AI助手**：支持语音交互、多语言翻译及智能问答
 - **个性推荐**：基于混合推荐算法，动态适配用户需求
@@ -22,12 +24,14 @@
 ## 🛠️ 技术栈
 
 ### 前端
+
 - **PC端 (Web)**: Vue 3 + Element Plus + Vite + Pinia + ECharts
 - **移动端 (App)**: UniApp + uView UI + Vue 3 + Pinia
 - **AI能力**: 科大讯飞API (实时ASR)
 - **会议能力**: zego sdk (实时音视频)
 
 ### 后端
+
 - **框架**: Spring Boot 3 + Mybatis Plus
 - **数据库**: MySQL 8.0+
 - **缓存**: Redis
@@ -35,6 +39,7 @@
 - **AI能力**: 百度AI SDK (OCR), Kimi API (大模型)
 
 ### 开发工具
+
 - **前端构建**: Vite (Web), HBuilderX (App)
 - **后端构建**: Maven
 - **接口文档**: OpenAPI + Swagger
@@ -65,6 +70,7 @@ smartmeet-matrix/
 ## 🚀 快速开始
 
 ### 环境要求
+
 - JDK 17+ (后端)
 - Node.js 18+ (前端)
 - MySQL 8.0+ (数据库)
@@ -72,6 +78,8 @@ smartmeet-matrix/
 - Maven 3.6+ (后端构建)
 
 ### 1. 后端服务启动
+
+#### Spring Boot 后端
 
 ```bash
 cd backend-springboot
@@ -84,7 +92,12 @@ mvn clean install
 mvn spring-boot:run
 ```
 
-后端服务默认运行在 `http://localhost:8080`
+springboot后端服务默认运行在 `http://localhost:8080`
+
+#### FastAPI 后端
+
+如需启动 FastAPI 后端服务，请参考 [FastAPI 后端运行指南](docs/run_backend_fastapi.md)。
+FastAPI 后端服务默认占用 8000 和 8001 端口
 
 ### 2. PC端 Web 项目启动
 
@@ -125,6 +138,7 @@ npm install
 ## 🔧 配置说明
 
 ### 后端配置 (`backend-springboot/src/main/resources/application.yml`)
+
 ```yaml
 spring:
   datasource:
@@ -134,7 +148,7 @@ spring:
   redis:
     host: localhost
     port: 6379
-    password: 
+    password:
   servlet:
     multipart:
       max-file-size: 10MB
@@ -148,12 +162,14 @@ spring:
 ```
 
 ### 前端 API 配置
+
 - PC端: 修改 `frontend-web/src/config/api.js` 中的 `baseURL`
 - 移动端: 修改 `frontend-app/config/api.js` 中的 `baseURL`
 
 ## 📈 开发计划
 
 ### 已完成
+
 - [x] 项目架构设计与技术选型
 - [x] 后端基础框架搭建 (Spring Boot + MyBatis Plus)
 - [x] PC端基础框架搭建 (Vue3 + Element Plus)
@@ -162,6 +178,7 @@ spring:
 - [x] 后端接口文档 (openapi + swagger生成)
 
 ### 计划中
+
 - [ ] 重构个性化推荐 (使用文本相似度计算)
 
 ## 📄 许可证
